@@ -175,9 +175,9 @@ def add_movie(
 def main() -> int:
     ap = argparse.ArgumentParser(description="Discover Korean horror-ish movies from TMDb and add to Radarr.")
     ap.add_argument("--dry-run", action="store_true", help="Print what would be added, but do not add to Radarr.")
-    ap.add_argument("--tags", default="", help="Comma-separated tag names or IDs to apply in Radarr.")
-    ap.add_argument("--quality-profile", default="", help="Quality profile name or ID (default: Radarr first profile).")
-    ap.add_argument("--root-folder", default="", help="Root folder path (default: Radarr first root folder).")
+    ap.add_argument("--tags", default=env("RADARR_TAGS", ""), help="Comma-separated tag names or IDs to apply in Radarr.")
+    ap.add_argument("--quality-profile", default=env("RADARR_QUALITY_PROFILE", ""), help="Quality profile name or ID (default: Radarr first profile).")
+    ap.add_argument("--root-folder", default=env("RADARR_ROOT_FOLDER", ""), help="Root folder path (default: Radarr first root folder).")
 
     # TMDb filters
     ap.add_argument("--min-vote-avg", type=float, default=float(env("MIN_VOTE_AVG", "7.0")))
