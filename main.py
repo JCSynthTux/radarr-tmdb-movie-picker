@@ -123,8 +123,11 @@ def resolve_tag_ids(radarr: RadarrAPI, tags: List[str]) -> List[int]:
             resolved.append(name_to_id[key])
             continue
 
-        # Create tag if missing
-        created = radarr.create_tag({"label": raw})
+        try:
+            created = radarr.create_tag(raw)          
+        except TypeError:
+            created = radarr.create_tag(label=raw)    
+
         resolved.append(int(created["id"]))
         name_to_id[key] = int(created["id"])
 
