@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: radarr-tmdb-movie-picker
+  namespace: radarr
+spec:
+  schedule: "30 * * * *"
+  startingDeadlineSeconds: 600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: radarr-tmdb-khorror-picker-job
+            image: ghcr.io/jcsynthtux/radarr-tmdb-movie-picker:sha-8615be6
+            imagePullPolicy: IfNotPresent
+            env:
+              - name: RADARR_URL
+                value: http://radarr.radarr.svc.cluster.local:7878
+              - name: RADARR_ROOT_FOLDER
+                value: /mnt/media/movies
+              - name: RADARR_QUALITY_PROFILE
+                value: Optimized
+              - name: RADARR_TAGS
+                value: tmdb,job,khorror
+              - name: RADARR_API_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: radarr-tmdb-movie-picker-secrets
+                    key: RADARR_API_KEY
+              - name: TMDB_API_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: radarr-tmdb-movie-picker-secrets
+                    key: TMDB_API_KEY
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              runAsUser: 10001
+              runAsGroup: 10001
+              capabilities:
+                drop: ["ALL"]
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                cpu: 250m
+                memory: 128Mi
+          restartPolicy: OnFailure
+          priorityClassName: medium-priority 
